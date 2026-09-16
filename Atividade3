@@ -1,0 +1,106 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+
+#include "ea551-mat-txt-parser.h"
+
+struct header {
+    unsigned char head[4];
+    uint8_t dtype;
+    uint32_t nlinhas;
+    uint32_t ncols;
+};
+
+int main(void)
+{
+    int c = getchar();
+    if (c == EOF) return 1;
+    ungetc(c, stdin);
+
+    if (c == '[') {          /* stdin = bytes do .txt */
+        yyin = stdin;
+        // Chama o parser para interpretar a stream de caracteres de entrada como uma matriz na memória RAM
+        // Note que ea551_mat é definido em ea551-mat-txt-parser.h
+        if (yyparse() != 0 || !ea551_mat) return 1;
+
+        // Chegamos aqui se o parser rodou sem erros e ea551_mat é um ponteiro válido para a matriz na memória RAM
+        print_matrix(ea551_mat);
+
+        ptrdiff_t nlinhas = arrlen(ea551_mat->linhas);
+        ptrdiff_t ncols   = nlinhas ? arrlen(ea551_mat->linhas[0]) : 0;
+
+
+        /* TODO: gravar ea551_mat em stdout como .emat
+           (header com dtype / nlinhas / ncols + sequência de bytes no tipo de ea551_mat->dtype) */
+        struct header h;
+        h.head[0] = 0x45; /* 'E' */
+        h.head[1] = 0x4D; /* 'M' */
+        h.head[2] = 0x41; /* 'A' */
+        h.head[3] = 0x54; /* 'T' */
+        h.dtype   = (uint8_t) ea551_mat->dtype;
+        h.nlinhas = (uint32_t) nlinhas;
+        h.ncols   = (uint32_t) ncols;
+
+        /* escreve o header*/
+        fwrite(h.head, sizeof(h.head), 1, stdout);
+        fwrite(&h.dtype, sizeof(h.dtype), 1, stdout);
+        fwrite(&h.nlinhas, sizeof(h.nlinhas), 1, stdout);
+        fwrite(&h.ncols, sizeof(h.ncols), 1, stdout);
+       
+        /*conteudo do arquivo*/
+        for(ptrdiff_t i = 0; i <nlinhas; i++){
+            for(ptrdiff_t i = 0; j < ncols; j++){
+                double valor = ea551_mat->linhas[i][j];
+
+                switch (ea551_mat->dtype){
+                    case EA551_DTYPE_UNIT8:{
+                        unit8_t v = (unit8_t) valor;
+                        fwrite(&v, sizeof(v), 1, stdout);
+                        break;
+                    }
+                                     
+                    case EA551_DTYPE_UNIT32:{
+                        unit32_t v = (unit32_t) valor;
+                        fwrite(&v, sizeof(v), 1, stdout);
+                        break;
+                    }
+
+                    case EA551_DTYPE_FLOAT32:{
+                        unit8_t v = (unit8_t) valor;
+                        fwrite(&v, sizeof(v), 1, stdout);
+                        break;
+                    }
+                    
+                }
+            }
+        }
+
+        ea551_mat_free(ea551_mat);
+        return 0;
+    }
+
+    else{
+        /* verificar se o arquivo é um emat*/
+        struct header h;
+        fread(h.head, sizeof(h.head), 1, stdin);
+        if (h.head[0] != 0x45 || h.head[1] != 0x4D || h.head[2] != 0x41 || h.head[3] != 0x54){ /* verificar se o arquivo é valido*/
+            return 1;
+        }
+        
+        /* leitura do type, numero de linhas e numero de colunas*/
+        fread(&h.dtype,sizeof(h.dtype), 1, stdin);
+        fread(&h.nlinhas,sizeof(h.nlinhas), 1,stdin);
+        fread( &h.ncols,sizeof(h.ncols), 1, stdin);
+        
+
+
+    }
+
+
+
+    /* TODO: stdin = bytes do .emat — ler header + sequência de bytes no tipo de ea551_mat->dtype e imprimir a matriz */
+    return 1;
+}
+
