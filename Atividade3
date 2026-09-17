@@ -51,24 +51,24 @@ int main(void)
        
         /*conteudo do arquivo*/
         for(ptrdiff_t i = 0; i <nlinhas; i++){
-            for(ptrdiff_t i = 0; j < ncols; j++){
+            for(ptrdiff_t j = 0; j < ncols; j++){
                 double valor = ea551_mat->linhas[i][j];
 
                 switch (ea551_mat->dtype){
-                    case EA551_DTYPE_UNIT8:{
-                        unit8_t v = (unit8_t) valor;
+                    case EA551_DTYPE_UINT8:{
+                        uint8_t v = (uint8_t) valor;
                         fwrite(&v, sizeof(v), 1, stdout);
                         break;
                     }
                                      
-                    case EA551_DTYPE_UNIT32:{
-                        unit32_t v = (unit32_t) valor;
+                    case EA551_DTYPE_INT32:{
+                        uint32_t v = (uint32_t) valor;
                         fwrite(&v, sizeof(v), 1, stdout);
                         break;
                     }
 
                     case EA551_DTYPE_FLOAT32:{
-                        unit8_t v = (unit8_t) valor;
+                        float v = (float) valor;
                         fwrite(&v, sizeof(v), 1, stdout);
                         break;
                     }
@@ -86,21 +86,66 @@ int main(void)
         struct header h;
         fread(h.head, sizeof(h.head), 1, stdin);
         if (h.head[0] != 0x45 || h.head[1] != 0x4D || h.head[2] != 0x41 || h.head[3] != 0x54){ /* verificar se o arquivo é valido*/
+            fprintf(stderr, "arquivo .emat invalido\n");
             return 1;
         }
         
         /* leitura do type, numero de linhas e numero de colunas*/
-        fread(&h.dtype,sizeof(h.dtype), 1, stdin);
-        fread(&h.nlinhas,sizeof(h.nlinhas), 1,stdin);
-        fread( &h.ncols,sizeof(h.ncols), 1, stdin);
-        
+        fread(&h.dtype, sizeof(h.dtype), 1, stdin);
+        fread(&h.nlinhas, sizeof(h.nlinhas), 1,stdin);
+        fread(&h.ncols, sizeof(h.ncols), 1, stdin);
+        printf("["); /* imprime o primimeiro colchete */
+        for (uint32_t i = 0; i <h.nlinhas; i++){
+            printf("["); /*inicio de uma linha */
+            for(uint32_t j = 0; j < h.ncols; j++){ /* imprime os valores das ncols que pertencem a mesma linha*/
+                double valor;
+                switch (h.dtype){
+                    case EA551_DTYPE_UINT8: {
+                        uint8_t v;
+                        fread(&v, sizeof(v), 1, stdin);
+                        valor = (double) v;
+                        break;
+                    }
+                                     
+                    case EA551_DTYPE_INT32: {
+                        int32_t v;
+                        fread(&v, sizeof(v), 1, stdin);
+                        valor = (double) v;
+                        break;
+                    }
 
+                    case EA551_DTYPE_FLOAT32: {
+                        float v;
+                        fread(&v, sizeof(v), 1, stdin);
+                        valor = (double) v;
+                        break;
+                    }
+                }
 
+                printf("%g", valor);
+
+                if( j == h.ncols - 1){ /* ultimo elemento da linha*/
+                    printf("]");
+                }
+
+                else{
+                    printf(",");
+                }
+            }
+
+            if( i == h.nlinhas - 1){ /* ultima linha*/
+                printf("]");
+            }
+
+            else{
+                printf(",");
+            }
+        }
+        printf("]\n");
+
+        return 0;
     }
-
-
-
-    /* TODO: stdin = bytes do .emat — ler header + sequência de bytes no tipo de ea551_mat->dtype e imprimir a matriz */
+    
     return 1;
 }
 
