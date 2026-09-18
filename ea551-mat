@@ -13,7 +13,7 @@ struct header {
     uint32_t ncols;
 };
 
-static const char *dtype_name(uint8_t dtype)
+static const char *dtype_name(uint8_t dtype) // associa os tipos de caracter aos seus nomes
 {
     switch (dtype) {
         case EA551_DTYPE_UINT8:   return "uint8";
@@ -44,7 +44,7 @@ int main(void)
 
         /* TODO: gravar ea551_mat em stdout como .emat
            (header com dtype / nlinhas / ncols + sequência de bytes no tipo de ea551_mat->dtype) */
-        struct header h;
+        struct header h; // atribui os valores do head, numero de linhas, numero de colunas e tipo a struct
         h.head[0] = 0x45; /* 'E' */
         h.head[1] = 0x4D; /* 'M' */
         h.head[2] = 0x41; /* 'A' */
@@ -54,13 +54,13 @@ int main(void)
         h.ncols   = (uint32_t) ncols;
 
         /* escreve o header*/
-        fwrite(h.head, sizeof(h.head), 1, stdout);
+        fwrite(h.head, sizeof(h.head), 1, stdout); 
         fwrite(&h.dtype, sizeof(h.dtype), 1, stdout);
         fwrite(&h.nlinhas, sizeof(h.nlinhas), 1, stdout);
         fwrite(&h.ncols, sizeof(h.ncols), 1, stdout);
        
         /*conteudo do arquivo*/
-        for(ptrdiff_t i = 0; i <nlinhas; i++){
+        for(ptrdiff_t i = 0; i <nlinhas; i++){ // escreve no arquivo em binario o valor de cada elemento da matriz de acordo com o seu tipo
             for(ptrdiff_t j = 0; j < ncols; j++){
                 double valor = ea551_mat->linhas[i][j];
 
@@ -105,9 +105,9 @@ int main(void)
         fread(&h.nlinhas, sizeof(h.nlinhas), 1,stdin);
         fread(&h.ncols, sizeof(h.ncols), 1, stdin);
         
-        fprintf(stderr,"Header: %02X, %02X, %02X, %02X, %u linhas, %u colunas, tipo %s\n", h.head[0], h.head[1],h.head[2],h.head[3], h.nlinhas, h.ncols, dtype_name(h.dtype));
+        fprintf(stderr,"Header: %02X, %02X, %02X, %02X, %u linhas, %u colunas, tipo %s\n", h.head[0], h.head[1],h.head[2],h.head[3], h.nlinhas, h.ncols, dtype_name(h.dtype)); // imprime as especificações
         for (uint32_t i = 0; i <h.nlinhas; i++){
-            for(uint32_t j = 0; j < h.ncols; j++){ /* imprime os valores das ncols que pertencem a mesma linha*/
+            for(uint32_t j = 0; j < h.ncols; j++){ // imprime os valores do arquivo emat de acordo com o seu tipo
                 double valor;
                 switch (h.dtype){
                     case EA551_DTYPE_UINT8: {
