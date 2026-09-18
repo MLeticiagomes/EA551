@@ -13,6 +13,16 @@ struct header {
     uint32_t ncols;
 };
 
+static const char *dtype_name(uint8_t dtype)
+{
+    switch (dtype) {
+        case EA551_DTYPE_UINT8:   return "uint8";
+        case EA551_DTYPE_INT32:   return "int32";
+        case EA551_DTYPE_FLOAT32: return "float32";
+        default:                  return "desconhecido";
+    }
+}
+
 int main(void)
 {
     int c = getchar();
@@ -26,7 +36,7 @@ int main(void)
         if (yyparse() != 0 || !ea551_mat) return 1;
 
         // Chegamos aqui se o parser rodou sem erros e ea551_mat é um ponteiro válido para a matriz na memória RAM
-        print_matrix(ea551_mat);
+        // print_matrix(ea551_mat); eu comentei essa linha pois ao executar o arquivo .h ele ja chama o print_matriz dentro do proprio codigo, por essa razão as especificações da matriz e a matriz estavam sendo impressas duas vezes no terminal
 
         ptrdiff_t nlinhas = arrlen(ea551_mat->linhas);
         ptrdiff_t ncols   = nlinhas ? arrlen(ea551_mat->linhas[0]) : 0;
@@ -94,9 +104,9 @@ int main(void)
         fread(&h.dtype, sizeof(h.dtype), 1, stdin);
         fread(&h.nlinhas, sizeof(h.nlinhas), 1,stdin);
         fread(&h.ncols, sizeof(h.ncols), 1, stdin);
-        printf("["); /* imprime o primimeiro colchete */
+        
+        fprintf(stderr,"Header: %02X, %02X, %02X, %02X, %u linhas, %u colunas, tipo %s\n", h.head[0], h.head[1],h.head[2],h.head[3], h.nlinhas, h.ncols, dtype_name(h.dtype));
         for (uint32_t i = 0; i <h.nlinhas; i++){
-            printf("["); /*inicio de uma linha */
             for(uint32_t j = 0; j < h.ncols; j++){ /* imprime os valores das ncols que pertencem a mesma linha*/
                 double valor;
                 switch (h.dtype){
@@ -122,27 +132,11 @@ int main(void)
                     }
                 }
 
-                printf("%g", valor);
-
-                if( j == h.ncols - 1){ /* ultimo elemento da linha*/
-                    printf("]");
-                }
-
-                else{
-                    printf(",");
-                }
+                fprintf(stderr,"%g ", valor);
             }
-
-            if( i == h.nlinhas - 1){ /* ultima linha*/
-                printf("]");
-            }
-
-            else{
-                printf(",");
-            }
+            
+            fprintf(stderr, "\n");
         }
-        printf("]\n");
-
         return 0;
     }
     
