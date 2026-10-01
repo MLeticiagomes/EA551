@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Uso: %s arquivo_saida.emat < arquivo_entrada.txt\n", argv[0]);
         return 1;
     }
+
     int c = getchar();
     if (c == EOF) return 1;
     ungetc(c, stdin);
@@ -150,7 +151,8 @@ int main(int argc, char *argv[])
                             total_char += n;
                         }
                         break;
-                    }                   
+                    }
+                   
                 }
             }
         }

@@ -1,4 +1,3 @@
-#define _POSIX_C_SOURCE 200809L 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,7 +15,7 @@
 
 volatile sig_atomic_t interrompido = 0;
 
-void handler_sigint(int sig){
+void handler_sigint(int sig){ /* indicar e houve uma interrupção*/
     interrompido = 1;
 }
 
@@ -27,9 +26,10 @@ struct header {
     uint32_t ncols;
 };
 
+
 int main (void){
 
-    sem_t *pode_ler;
+    sem_t *pode_ler; /* semaforo*/
     pode_ler = sem_open("/ex_g_sem", O_CREAT, 0600, 0);
 
     if (pode_ler == SEM_FAILED){
@@ -116,41 +116,53 @@ int main (void){
         return 1;
     }
 
-    /* interromper o processo de for feito um ctrl-c*/
-    struct sigaction sa;
-    sa.sa_handler = handler_sigint; /* define a função chamada quando o sinal for recebido*/
-    sigemptyset(&sa.sa_mask); /* impede que o handler seja interrompido por outro sinal em execução*/
-    sa.sa_flags = 0;
-    sigaction(SIGINT, &sa, NULL); /* associa o sinal configurado com a struct que possui a configuração*/
-
+    /* interromper o processo de forma graciosa ao ser feito um ctrl-c*/
+    signal(SIGINT, handler_sigint);
 
     /* cria o processo filho */
     pid_t pid = fork();
 
     if(pid == 0){  /* processo filho*/
        
-        signal(SIGINT, SIG_DFL);
+        signal(SIGINT, SIG_DFL); /* interrupçao*/
 
-        sem_wait(pode_ler); /*espera o semaforo libear a leitura*/
-        uint32_t buf[h.ncols * h.nlinhas];
-        struct fenster f = { .title = "emat", .width = h.ncols, .height = h.nlinhas, .buf = buf};
+        sem_wait(pode_ler); /*espera o semaforo liberar a leitura*/
+
+        const uint32_t ESCALA = 24; /* aumentar a imagem gerada*/
+        uint32_t largura = h.ncols * ESCALA;
+        uint32_t altura  = h.nlinhas * ESCALA;
+
+        uint32_t *buf = malloc((size_t)largura * altura * sizeof(uint32_t)); /* aloca na memoria o que será a tela */
+        if (!buf) {
+            perror("malloc");
+            exit(1);
+        }
+
+        struct fenster f = { .title = "emat", .width = largura, .height = altura, .buf = buf};
         fenster_open(&f);
 
         while (fenster_loop(&f) == 0){
             for(uint32_t i = 0; i < h.nlinhas; i++){
                 for(uint32_t j = 0; j < h.ncols; j++){
-                    unsigned char valor = memoria[i * h.ncols + j]; /* encontra o byte correspondete a um determinado valor na matriz */
+                    unsigned char valor = memoria[i * h.ncols + j]; /* encontra o byte correspondente a um determinado valor na matriz */
                     uint32_t cor = (valor << 16) | (valor << 8) | valor; /* gera todos os bytes em escala cinza*/
-                    fenster_pixel(&f, j, i) = cor;
+
+                    /* desenha um bloco ESCALA x ESCALA para ampliar cada pixel original */
+                    for (uint32_t dy = 0; dy < ESCALA; dy++){
+                        for (uint32_t dx = 0; dx < ESCALA; dx++){
+                            fenster_pixel(&f, j * ESCALA + dx, i * ESCALA + dy) = cor;
+                        }
+                    }
                 }
             }
         }
         fenster_close(&f);
+        free(buf);
         exit(0);
     }
 
     total = 0;
-    while(total < tam_total && !interrompido){
+    while(total < tam_total && !interrompido){ /* lê todos os valores do arquivo de entrada até o fim, ou até q haja uma interrupção*/
         n = read(STDIN_FILENO, memoria + total, tam_total - total);
         if( n < 0){
             if(errno == EINTR){
@@ -167,7 +179,7 @@ int main (void){
         total += n;
     }
 
-    if (!interrompido){
+    if (!interrompido){ /* se não houver uma interrupção o processo pai sinaliza  para que o processo filho possa ler a memoria compartilhada*/
         sem_post(pode_ler);
     } 
 
@@ -179,6 +191,3 @@ int main (void){
     return 0;  
     
 }
-
-
-
