@@ -116,8 +116,7 @@ int main (void){
         return 1;
     }
 
-    /* interromper o processo de forma graciosa ao ser feito um ctrl-c*/
-    signal(SIGINT, handler_sigint);
+    signal(SIGINT, handler_sigint); /* caso haja uma interrupção é ativada a função handler_sigint*/
 
     /* cria o processo filho */
     pid_t pid = fork();
@@ -183,7 +182,7 @@ int main (void){
         sem_post(pode_ler);
     } 
 
-    waitpid(pid, NULL, 0);
+    waitpid(pid, NULL, 0); 
     sem_close(pode_ler);
     sem_unlink("/ex_g_sem");
     munmap(memoria, tam_total);

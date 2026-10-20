@@ -137,7 +137,7 @@ double **multiplicar(double **A, uint32_t a_nlin, uint32_t a_ncol, double **B, u
         C[i] = malloc(b_ncol * sizeof(double));
         if (!C[i]) { perror("malloc"); return NULL; }
 
-        for (uint32_t j = 0; j < b_ncol; j++) { /* percorre os valores de umacoluna de b*/
+        for (uint32_t j = 0; j < b_ncol; j++) { /* percorre os valores de uma coluna de b*/
             double soma = 0.0;
             for (uint32_t k = 0; k < a_ncol; k++) {  /* percorre os valores de uma coluna de a*/
                 soma += A[i][k] * B[k][j]; /* multiplica todos os valores  que estão na coluna k de A e na linha k de B e soma os resultados das multiplicações*/
@@ -241,7 +241,7 @@ int main(int argc, char *argv[]){
  
     /* processo filho que compara o valor presenta na memoria compartilhada  como o valor da matriz C*/
 
-    pid_t pid = fork(); /* cri um processo filho */
+    pid_t pid = fork(); /* cria um processo filho */
 
     if ( pid == 0){
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[]){
             for(uint32_t j = 0; j < B.ncols; j++){
                 double valor = memoria[i * B.ncols + j]; /* encontra o valor na memoria */
                 double valor_esperado = respC[i][j]; /*  valor da matriz C recebida na entrda*/
-                printf(" %g ", valor);
+                //printf(" %g ", valor);
                 if (fabs(valor_esperado -  valor) > EPSILON){ /* verifica se a diferença entre o valor esperado e o recebido é maior que epsilon (evitar diferenças devido a aproximações por ponto flutuante)*/
                     printf(" Valor esperado : %g | Valor obtido %g ", valor_esperado, valor); /* imprime as diferenças obtidas*/
                     corretude = 0;

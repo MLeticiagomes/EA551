@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
     if (c == EOF) return 1;
     ungetc(c, stdin);
 
-    if (c == '[') {          /* stdin = bytes do .txt */
+    if (c == '[') { /* stdin = bytes do .txt */
         
         yyin = stdin;
         // Chama o parser para interpretar a stream de caracteres de entrada como uma matriz na memória RAM

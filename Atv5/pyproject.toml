@@ -1,0 +1,26 @@
+[project]
+name = "ea551-projeto-final"
+version = "0.1.0"
+description = "EA551 - Otimizando Treino e Inferência em Aprendizado de Máquina"
+authors = [
+    { name = "Diedre S. do Carmo", email = "diedre@unicamp.br" },
+]
+requires-python = ">=3.12"
+dependencies = [
+    "torch",
+    "numpy",
+    "tqdm",
+    "posix-ipc>=1.3.2",
+]
+
+[tool.uv]
+package = false
+
+# Labs sem GPU: usar wheels CPU
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
