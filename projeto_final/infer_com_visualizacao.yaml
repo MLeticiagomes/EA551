@@ -1,0 +1,5 @@
+modo: "infer"
+pesos: "W.npy"
+entrada: "mnist_emat/test/1/60002.emat"   
+matmul_threads: 2
+visualizacao: 1        
