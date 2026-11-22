@@ -14,7 +14,7 @@
 #include "chave.h"
 
 #define BUFFER_MAX    128     /* = CAP do dataloader.c */
-#define MATMUL_MAX    64     /* = MAX_THREADS do matmul_otm.c */
+#define MATMUL_MAX    128     /* = MAX_THREADS do matmul_otm.c */
 #define PRODUTOR_MAX  256    /* = NTHREADS_MAX do dataloader.c */
 #define CONSUMIDOR_MAX 64    /* = NCONS_MAX do dataloader.c */
 
