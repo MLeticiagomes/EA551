@@ -244,7 +244,7 @@ int main(int argc, char *argv[]){
 
     /* cria as threads de ler as matrizes*/
     for (int i = 0; i < NTHREADS; i++) { 
-        pthread_create(&t[i], NULL, ler_matriz_thread, &targs[i]);  /* associa* cada matriz a um thread -> thread 0 ira ler a matriz A, thread 1 a matriz B e thread 2 a matriz C/
+        pthread_create(&t[i], NULL, ler_matriz_thread, &targs[i]);  /* associa* cada matriz a um thread -> thread 0 ira ler a matriz A, thread 1 a matriz B e thread 2 a matriz C*/
     }
     for (int i = 0; i < NTHREADS; i++) {
         pthread_join(t[i], NULL);

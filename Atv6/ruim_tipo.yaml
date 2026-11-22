@@ -1,0 +1,4 @@
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: "4"

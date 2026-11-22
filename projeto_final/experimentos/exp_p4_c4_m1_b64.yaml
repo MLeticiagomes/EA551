@@ -1,0 +1,9 @@
+# EA551-YAML: modo teste sobre a pasta do MNIST
+modo: "test"
+pesos: "W.npy"                 # .npy gerado pelo train.py
+entrada: "mnist_emat/test"     # pasta com subpastas 0..9
+
+matmul_threads: 1
+buffer_tamanho: 64
+produtor_threads: 4
+consumidores: 4

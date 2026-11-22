@@ -1,0 +1,3 @@
+modo: "treino"
+pesos: "W.npy"
+entrada: "mnist_emat/test"

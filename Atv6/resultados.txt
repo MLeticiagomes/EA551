@@ -1,0 +1,55 @@
+=== cfg_lento ===
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: 1
+buffer_tamanho: 1
+produtor_threads: 1
+---
+modo=test pesos=W.npy entrada=mnist_emat/test matmul_threads=1 buffer=1 produtores=1 viz=0
+Acuracia no teste: 8347/10000 = 0.8347
+
+=== cfg_medio ===
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: 2
+buffer_tamanho: 8
+produtor_threads: 4
+---
+modo=test pesos=W.npy entrada=mnist_emat/test matmul_threads=2 buffer=8 produtores=4 viz=0
+Acuracia no teste: 8347/10000 = 0.8347
+
+=== cfg_rapido ===
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: 4
+buffer_tamanho: 32
+produtor_threads: 30
+---
+modo=test pesos=W.npy entrada=mnist_emat/test matmul_threads=4 buffer=32 produtores=30 viz=0
+Acuracia no teste: 8347/10000 = 0.8347
+
+=== cfg_matmul8 ===
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: 8
+buffer_tamanho: 32
+produtor_threads: 30
+---
+modo=test pesos=W.npy entrada=mnist_emat/test matmul_threads=8 buffer=32 produtores=30 viz=0
+Acuracia no teste: 8347/10000 = 0.8347
+
+=== cfg_prod1 ===
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: 1
+buffer_tamanho: 32
+produtor_threads: 1
+---
+modo=test pesos=W.npy entrada=mnist_emat/test matmul_threads=1 buffer=32 produtores=1 viz=0
+Acuracia no teste: 8347/10000 = 0.8347
+

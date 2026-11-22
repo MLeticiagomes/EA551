@@ -1,0 +1,5 @@
+modo: "infer"
+pesos: "W.npy"
+entrada: "mnist_emat/test/7/60000.emat"   # ajuste para um .emat real
+matmul_threads: 2
+visualizacao: 1                # 1 abre a janela X11, 0 só imprime a predição

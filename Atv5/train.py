@@ -33,12 +33,7 @@ class SharedStruct(ctypes.Structure):
 
 
 def read_mnist_emat_image(global_state):
-    """
-    Consome UM slot (uma imagem inteira) do buffer compartilhado.
-    numpy.frombuffer le os 784 doubles de uma vez, sem laco Python por pixel
-    -- é essa mudança (granularidade por imagem, não por pixel) que elimina
-    o overhead que tornava a versão anterior mais lenta que o baseline.
-    """
+    
     shared = global_state["shared"]
     sem_leitura = global_state["sem_leitura"]
     sem_mutex = global_state["sem_mutex"]
@@ -49,12 +44,11 @@ def read_mnist_emat_image(global_state):
 
     idx = shared.out_idx
 
-    # zero-copy: numpy enxerga diretamente os bytes do slot compartilhado
+    #  numpy enxerga diretamente os bytes do slot compartilhado
     pixel_array = np.frombuffer(shared.buf[idx], dtype=np.float64)
     label = int(shared.label[idx])
 
-    # copiamos ANTES de soltar o slot, pois o produtor pode reescrevê-lo
-    # assim que o semáforo for liberado
+    # copiao slot e transforma em um tensor
     image_tensor = torch.from_numpy(pixel_array.copy()).reshape(1, 1, 28, 28)
 
     shared.out_idx = (idx + 1) % CAP

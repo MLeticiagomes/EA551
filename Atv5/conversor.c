@@ -53,24 +53,24 @@ static int interpretar_dicionario(const char *txt, struct NpyHeader *npy)
     const char *p;
 
     /* descr */
-    p = strstr(txt, "'descr'");
+    p = strstr(txt, "'descr'"); /* procura a chave descr, pula os 7 caracteres da chave, encontrando dois-pontos e o valor de descr*/
     if (!p || !(p = strchr(p + 7, ':')) || !(p = strchr(p, '\''))) return -1;
     p++;
-    const char *q = strchr(p, '\'');
+    const char *q = strchr(p, '\''); 
     if (!q || (size_t)(q - p) >= sizeof(npy->header_npy)) return -1;
     memcpy(npy->header_npy, p, q - p);
     npy->header_npy[q - p] = '\0';
 
     /* fortran_order */
-    p = strstr(txt, "'fortran_order'");
+    p = strstr(txt, "'fortran_order'"); /* acha a chave, dois pontos e pula os espaços  e compara os proximos caracteres com True*/
     if (!p || !(p = strchr(p, ':'))) return -1;
     p++;
     while (*p == ' ') p++;
     npy->fortran_order = (strncmp(p, "True", 4) == 0);
 
     /* shape */
-    p = strstr(txt, "'shape'");
-    if (!p || !(p = strchr(p, '('))) return -1;
+    p = strstr(txt, "'shape'"); 
+    if (!p || !(p = strchr(p, '('))) return -1; /* roda um laço ate encontrar ")", pulando espaços e virgulas e guarda o valor lido*/
     p++;
     npy->ndim = 0;
     while (*p && *p != ')') {
@@ -98,14 +98,14 @@ int ler_cabecalho(int fd, struct NpyHeader *npy) /* leitura das informaçoes do 
 
     uint32_t hlen;
     long prefixo;
-    if (pre[6] == 1) {
+    if (pre[6] == 1) { /* tamanho do cabeçalho*/
         unsigned char b[2];
-        if (leitura(fd, b, 2) < 0) return -1;
+        if (leitura(fd, b, 2) < 0) return -1; /* 10 bytes */
         hlen = b[0] | (b[1] << 8);
         prefixo = 10;
-    } else if (pre[6] == 2 || pre[6] == 3) {
+    } else if (pre[6] == 2 || pre[6] == 3) { 
         unsigned char b[4];
-        if (leitura(fd, b, 4) < 0) return -1;
+        if (leitura(fd, b, 4) < 0) return -1; /* 12 bytes */
         hlen = b[0] | (b[1] << 8) | (b[2] << 16) | ((uint32_t)b[3] << 24);
         prefixo = 12;
     } else {
@@ -119,17 +119,17 @@ int ler_cabecalho(int fd, struct NpyHeader *npy) /* leitura das informaçoes do 
 
     char *txt = malloc(hlen + 1);
     if (!txt) { perror("malloc"); return -1; }
-    if (leitura(fd, txt, hlen) < 0) { free(txt); return -1; }
+    if (leitura(fd, txt, hlen) < 0) { free(txt); return -1; } /* leitura dos valores*/
     txt[hlen] = '\0';
 
-    int rc = interpretar_dicionario(txt, npy);
+    int rc = interpretar_dicionario(txt, npy); /* interpetação dos dados*/
     free(txt);
     if (rc < 0) {
         fprintf(stderr, "Falha ao interpretar o header\n");
         return -1;
     }
 
-    npy->data_offset = prefixo + hlen;
+    npy->data_offset = prefixo + hlen; /* onde os dados começam */
     return 0;
 }
 

@@ -15,9 +15,9 @@
 #include "ea551-mat-txt-parser.h"
 
 
-#define CAP         32     /* tamanho do buffer */
+#define CAP         128     /* tamanho do buffer */
 #define NUM_PIXELS  784    /* 28*28, fixo para o MNIST */
-#define NTHREADS    10      /* número de threads*/
+#define NTHREADS    30      /* número de threads*/
 
 /* memória compartilhada */
 #define SHM_NAME    "/ea551_shm"

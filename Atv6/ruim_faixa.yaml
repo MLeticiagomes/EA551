@@ -1,0 +1,4 @@
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+buffer_tamanho: 100

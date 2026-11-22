@@ -1,0 +1,6 @@
+modo: "test"
+pesos: "W.npy"
+entrada: "mnist_emat/test"
+matmul_threads: 8
+buffer_tamanho: 32
+produtor_threads: 30
