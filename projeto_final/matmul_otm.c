@@ -12,7 +12,7 @@
 
 #define EPSILON 1e-6
 #define NTHREADS    3       /* número de threads*/
-#define MAX_THREADS 64
+#define MAX_THREADS 128
 
 static int nthreads_mult = 4; /* threads da multiplicacao (configuravel) */
 
